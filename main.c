@@ -51,8 +51,8 @@ char* stristr(const char* haystack, const char* needle) {
 #define MAX_CONTACTS 1000
 #define MAX_FIELD_LEN 512
 #define MAX_LONG_FIELD_LEN 2048
-#define MAX_EMAILS 5
-#define MAX_PHONES 5
+#define MAX_EMAILS 3
+#define MAX_PHONES 3
 #define MAX_ADDRESSES 3
 
 // Window dimensions
@@ -1452,8 +1452,8 @@ int handle_detail_input(ContactList* list) {
 
 int handle_edit_input(ContactList* list) {
     int key = _getch();
-    int total_fields = 40; // Adjust based on actual field count
-    
+    int total_fields = 38; // Changed from 42 to 38 to reflect 3 emails and 3 phones
+
     if (key == 27) { // ESC - Cancel
         list->mode = (list->current_contact != NULL) ? VIEW_DETAIL : VIEW_LIST;
     } else if (key == 224) { // Arrow keys
@@ -1476,54 +1476,54 @@ int handle_edit_input(ContactList* list) {
             case 2: edit_field(c->given, 30); break;
             case 3: edit_field(c->family, 30); break;
             case 4: edit_field(c->nickname, 30); break;
-            // Email fields (5-9)
-            case 5: case 6: case 7: case 8: case 9: {
+            // Email fields (5-7)
+            case 5: case 6: case 7: {
                 int email_idx = list->edit_field - 5;
-                if (email_idx >= c->email_count && email_idx < MAX_EMAILS) {
+                if (email_idx >= c->email_count && email_idx < 3) {
                     c->email_count = email_idx + 1;
                     strcpy(c->emails[email_idx].type, "WORK");
                 }
                 edit_field(c->emails[email_idx].value, 40);
                 break;
             }
-            // Phone fields (10-14)
-            case 10: case 11: case 12: case 13: case 14: {
-                int phone_idx = list->edit_field - 10;
-                if (phone_idx >= c->phone_count && phone_idx < MAX_PHONES) {
+            // Phone fields (8-10)
+            case 8: case 9: case 10: {
+                int phone_idx = list->edit_field - 8;
+                if (phone_idx >= c->phone_count && phone_idx < 3) {
                     c->phone_count = phone_idx + 1;
                     strcpy(c->phones[phone_idx].type, "WORK");
                 }
                 edit_field(c->phones[phone_idx].value, 30);
                 break;
             }
-            case 15: edit_field(c->org, 50); break;
-            case 16: edit_field(c->title, 40); break;
-            case 17: edit_field(c->role, 40); break;
-            case 18: edit_field(c->bday, 20); break;
-            case 19: edit_field(c->anniversary, 20); break;
-            case 20: edit_field(c->lang, 20); break;
-            case 21: edit_field(c->tz, 30); break;
-            // Address fields (22-26)
-            case 22: edit_field(c->addresses[0].street, 40); break;
-            case 23: edit_field(c->addresses[0].locality, 30); break;
-            case 24: edit_field(c->addresses[0].region, 20); break;
-            case 25: edit_field(c->addresses[0].postalcode, 15); break;
-            case 26: edit_field(c->addresses[0].country, 30); break;
-            case 27: edit_field(c->url, 50); break;
-            case 28: edit_field(c->linkedin, 40); break;
-            case 29: edit_field(c->twitter, 30); break;
-            case 30: edit_field(c->impp, 40); break;
-            case 31: edit_field(c->birthplace, 40); break;
-            case 32: edit_field(c->birthplace_geo, 30); break;
-            case 33: edit_field(c->deathdate, 20); break;
-            case 34: edit_field(c->deathplace, 40); break;
-            case 35: edit_field(c->deathplace_geo, 30); break;
-            case 36: edit_field(c->related, 40); break;
-            case 37: edit_field(c->expertise, 40); break;
-            case 38: edit_field(c->hobby, 40); break;
-            case 39: edit_field(c->interest, 40); break;
-            case 40: edit_field(c->categories, 40); break;
-            case 41: edit_field(c->note, 50); break;
+            case 11: edit_field(c->org, 50); break;
+            case 12: edit_field(c->title, 40); break;
+            case 13: edit_field(c->role, 40); break;
+            case 14: edit_field(c->bday, 20); break;
+            case 15: edit_field(c->anniversary, 20); break;
+            case 16: edit_field(c->lang, 20); break;
+            case 17: edit_field(c->tz, 30); break;
+            // Address fields (18-22)
+            case 18: edit_field(c->addresses[0].street, 40); break;
+            case 19: edit_field(c->addresses[0].locality, 30); break;
+            case 20: edit_field(c->addresses[0].region, 20); break;
+            case 21: edit_field(c->addresses[0].postalcode, 15); break;
+            case 22: edit_field(c->addresses[0].country, 30); break;
+            case 23: edit_field(c->url, 50); break;
+            case 24: edit_field(c->linkedin, 40); break;
+            case 25: edit_field(c->twitter, 30); break;
+            case 26: edit_field(c->impp, 40); break;
+            case 27: edit_field(c->birthplace, 40); break;
+            case 28: edit_field(c->birthplace_geo, 30); break;
+            case 29: edit_field(c->deathdate, 20); break;
+            case 30: edit_field(c->deathplace, 40); break;
+            case 31: edit_field(c->deathplace_geo, 30); break;
+            case 32: edit_field(c->related, 40); break;
+            case 33: edit_field(c->expertise, 40); break;
+            case 34: edit_field(c->hobby, 40); break;
+            case 35: edit_field(c->interest, 40); break;
+            case 36: edit_field(c->categories, 40); break;
+            case 37: edit_field(c->note, 50); break;
         }
     } else if (key == 's' || key == 'S') { // Save
         update_revision(&list->edit_buffer);
