@@ -632,7 +632,17 @@ void draw_edit_form(Contact* contact, int selected_field) {
         if (field_index == selected_field) { \
             printf("[%-*s]", max_len, value); \
         } else { \
-            printf(" %-*s ", max_len, value); \
+            /* Print underscores for empty space */ \
+            char temp[256]; \
+            snprintf(temp, sizeof(temp), "%-*s", max_len, value); \
+            for (int i = 0; i < max_len; i++) { \
+                if (i < strlen(value)) { \
+                    printf("%c", temp[i]); \
+                } else { \
+                    printf("_"); \
+                } \
+            } \
+            printf("  "); /* Two spaces to clear any remaining brackets */ \
         } \
         y++; \
         field_index++; \
