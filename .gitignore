@@ -1,6 +1,7 @@
 /.claude
 /.cache
 api.txt
+*.vcf
 
 # Prerequisites
 *.d
@@ -57,3 +58,4 @@ dkms.conf
 
 # debug information files
 *.dwo
+contacts.vcf

@@ -123,9 +123,9 @@ typedef struct {
     
     // Online presence
     char url[MAX_FIELD_LEN];          // Website
-    char fburl[MAX_FIELD_LEN];        // Social media URLs
     char twitter[MAX_FIELD_LEN];
     char linkedin[MAX_FIELD_LEN];
+    char impp[MAX_FIELD_LEN];         // Instant messaging
     
     // Notes and metadata
     char note[MAX_LONG_FIELD_LEN];    // Notes
@@ -135,10 +135,17 @@ typedef struct {
     char created[MAX_FIELD_LEN];      // Creation timestamp
     
     // Additional fields
-    char photo_path[MAX_FIELD_LEN];   // Path to photo file
-    char sound[MAX_FIELD_LEN];        // Pronunciation
     char geo[MAX_FIELD_LEN];          // Geographic coordinates
     char kind[MAX_FIELD_LEN];         // Kind of object (individual/group/org/location)
+    char birthplace[MAX_FIELD_LEN];   // Birth place
+    char birthplace_geo[MAX_FIELD_LEN]; // Birth place coordinates
+    char deathplace[MAX_FIELD_LEN];   // Death place
+    char deathplace_geo[MAX_FIELD_LEN]; // Death place coordinates
+    char deathdate[MAX_FIELD_LEN];    // Death date
+    char related[MAX_FIELD_LEN];      // Related person
+    char expertise[MAX_FIELD_LEN];    // Areas of expertise
+    char hobby[MAX_FIELD_LEN];        // Hobbies
+    char interest[MAX_FIELD_LEN];     // Interests
 } Contact;
 
 typedef struct {
@@ -435,7 +442,7 @@ void draw_contact_detail(Contact* contact) {
     // Personal Information
     y = 3;  // Reset to top right column
     
-    if (strlen(contact->bday) > 0 || strlen(contact->anniversary) > 0) {
+    if (strlen(contact->bday) > 0 || strlen(contact->anniversary) > 0 || strlen(contact->birthplace) > 0 || strlen(contact->deathdate) > 0 || strlen(contact->deathplace) > 0) {
         set_color(FOREGROUND_WHITE | FOREGROUND_INTENSITY);
         gotoxy(x_label2, y); printf("── Personal Information ──");
         y += 2;
@@ -448,11 +455,35 @@ void draw_contact_detail(Contact* contact) {
             y++;
         }
         
+        if (strlen(contact->birthplace) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Birth Place:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->birthplace);
+            y++;
+        }
+        
         if (strlen(contact->anniversary) > 0) {
             set_color(FOREGROUND_WHITE);
             gotoxy(x_label2, y); printf("Anniversary:");
             set_color(FOREGROUND_GRAY);
             gotoxy(x_value2, y); printf("%s", contact->anniversary);
+            y++;
+        }
+        
+        if (strlen(contact->deathdate) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Death Date:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->deathdate);
+            y++;
+        }
+        
+        if (strlen(contact->deathplace) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Death Place:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->deathplace);
             y++;
         }
     }
@@ -491,7 +522,7 @@ void draw_contact_detail(Contact* contact) {
     }
     
     // Online presence
-    if (strlen(contact->url) > 0 || strlen(contact->linkedin) > 0) {
+    if (strlen(contact->url) > 0 || strlen(contact->linkedin) > 0 || strlen(contact->impp) > 0) {
         y++;
         set_color(FOREGROUND_WHITE | FOREGROUND_INTENSITY);
         gotoxy(x_label2, y); printf("── Online Presence ──");
@@ -502,6 +533,54 @@ void draw_contact_detail(Contact* contact) {
             gotoxy(x_label2, y); printf("Website:");
             set_color(FOREGROUND_GRAY);
             gotoxy(x_value2, y); printf("%s", contact->url);
+            y++;
+        }
+        
+        if (strlen(contact->impp) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Instant Msg:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->impp);
+            y++;
+        }
+    }
+    
+    // Interests & Skills
+    if (strlen(contact->related) > 0 || strlen(contact->expertise) > 0 || strlen(contact->hobby) > 0 || strlen(contact->interest) > 0) {
+        y++;
+        set_color(FOREGROUND_WHITE | FOREGROUND_INTENSITY);
+        gotoxy(x_label2, y); printf("── Interests & Skills ──");
+        y += 2;
+        
+        if (strlen(contact->related) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Related:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->related);
+            y++;
+        }
+        
+        if (strlen(contact->expertise) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Expertise:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->expertise);
+            y++;
+        }
+        
+        if (strlen(contact->hobby) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Hobby:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->hobby);
+            y++;
+        }
+        
+        if (strlen(contact->interest) > 0) {
+            set_color(FOREGROUND_WHITE);
+            gotoxy(x_label2, y); printf("Interest:");
+            set_color(FOREGROUND_GRAY);
+            gotoxy(x_value2, y); printf("%s", contact->interest);
             y++;
         }
     }
@@ -635,6 +714,28 @@ void draw_edit_form(Contact* contact, int selected_field) {
     DRAW_FIELD("Website", contact->url, 50);
     DRAW_FIELD("LinkedIn", contact->linkedin, 40);
     DRAW_FIELD("Twitter", contact->twitter, 30);
+    DRAW_FIELD("Instant Msg", contact->impp, 40);
+    
+    y++;
+    set_color(FOREGROUND_WHITE | FOREGROUND_INTENSITY);
+    gotoxy(x_label, y); printf("── Life Events ──");
+    y += 2;
+    
+    DRAW_FIELD("Birth Place", contact->birthplace, 40);
+    DRAW_FIELD("Birth Place Geo", contact->birthplace_geo, 30);
+    DRAW_FIELD("Death Date", contact->deathdate, 20);
+    DRAW_FIELD("Death Place", contact->deathplace, 40);
+    DRAW_FIELD("Death Place Geo", contact->deathplace_geo, 30);
+    
+    y++;
+    set_color(FOREGROUND_WHITE | FOREGROUND_INTENSITY);
+    gotoxy(x_label, y); printf("── Interests & Skills ──");
+    y += 2;
+    
+    DRAW_FIELD("Related", contact->related, 40);
+    DRAW_FIELD("Expertise", contact->expertise, 40);
+    DRAW_FIELD("Hobby", contact->hobby, 40);
+    DRAW_FIELD("Interest", contact->interest, 40);
     
     y++;
     set_color(FOREGROUND_WHITE | FOREGROUND_INTENSITY);
@@ -842,6 +943,66 @@ void write_vcard_contact(FILE* file, Contact* contact) {
         fprintf(file, "URL;TYPE=twitter:%s\n", escaped);
     }
     
+    // IMPP (Instant messaging)
+    if (strlen(contact->impp) > 0) {
+        escape_vcard_value(contact->impp, escaped);
+        fprintf(file, "IMPP:%s\n", escaped);
+    }
+    
+    // GEO (Geographic coordinates)
+    if (strlen(contact->geo) > 0) {
+        fprintf(file, "GEO:%s\n", contact->geo);
+    }
+    
+    // BIRTHPLACE with GEO
+    if (strlen(contact->birthplace) > 0) {
+        escape_vcard_value(contact->birthplace, escaped);
+        fprintf(file, "BIRTHPLACE:%s\n", escaped);
+        
+        if (strlen(contact->birthplace_geo) > 0) {
+            fprintf(file, "X-BIRTHPLACE-GEO:%s\n", contact->birthplace_geo);
+        }
+    }
+    
+    // DEATHPLACE with GEO
+    if (strlen(contact->deathplace) > 0) {
+        escape_vcard_value(contact->deathplace, escaped);
+        fprintf(file, "DEATHPLACE:%s\n", escaped);
+        
+        if (strlen(contact->deathplace_geo) > 0) {
+            fprintf(file, "X-DEATHPLACE-GEO:%s\n", contact->deathplace_geo);
+        }
+    }
+    
+    // DEATHDATE
+    if (strlen(contact->deathdate) > 0) {
+        fprintf(file, "DEATHDATE:%s\n", contact->deathdate);
+    }
+    
+    // RELATED
+    if (strlen(contact->related) > 0) {
+        escape_vcard_value(contact->related, escaped);
+        fprintf(file, "RELATED:%s\n", escaped);
+    }
+    
+    // EXPERTISE
+    if (strlen(contact->expertise) > 0) {
+        escape_vcard_value(contact->expertise, escaped);
+        fprintf(file, "EXPERTISE:%s\n", escaped);
+    }
+    
+    // HOBBY
+    if (strlen(contact->hobby) > 0) {
+        escape_vcard_value(contact->hobby, escaped);
+        fprintf(file, "HOBBY:%s\n", escaped);
+    }
+    
+    // INTEREST
+    if (strlen(contact->interest) > 0) {
+        escape_vcard_value(contact->interest, escaped);
+        fprintf(file, "INTEREST:%s\n", escaped);
+    }
+    
     // CATEGORIES
     if (strlen(contact->categories) > 0) {
         escape_vcard_value(contact->categories, escaped);
@@ -1035,6 +1196,28 @@ void read_vcard_contact(FILE* file, Contact* contact) {
             strcpy(contact->rev, value);
         } else if (strcmp(property, "KIND") == 0) {
             strcpy(contact->kind, value);
+        } else if (strcmp(property, "IMPP") == 0) {
+            unescape_vcard_value(value, contact->impp);
+        } else if (strcmp(property, "GEO") == 0) {
+            strcpy(contact->geo, value);
+        } else if (strcmp(property, "BIRTHPLACE") == 0) {
+            unescape_vcard_value(value, contact->birthplace);
+        } else if (strcmp(property, "X-BIRTHPLACE-GEO") == 0) {
+            strcpy(contact->birthplace_geo, value);
+        } else if (strcmp(property, "DEATHPLACE") == 0) {
+            unescape_vcard_value(value, contact->deathplace);
+        } else if (strcmp(property, "X-DEATHPLACE-GEO") == 0) {
+            strcpy(contact->deathplace_geo, value);
+        } else if (strcmp(property, "DEATHDATE") == 0) {
+            strcpy(contact->deathdate, value);
+        } else if (strcmp(property, "RELATED") == 0) {
+            unescape_vcard_value(value, contact->related);
+        } else if (strcmp(property, "EXPERTISE") == 0) {
+            unescape_vcard_value(value, contact->expertise);
+        } else if (strcmp(property, "HOBBY") == 0) {
+            unescape_vcard_value(value, contact->hobby);
+        } else if (strcmp(property, "INTEREST") == 0) {
+            unescape_vcard_value(value, contact->interest);
         }
     }
     
@@ -1259,7 +1442,7 @@ int handle_detail_input(ContactList* list) {
 
 int handle_edit_input(ContactList* list) {
     int key = _getch();
-    int total_fields = 29; // Adjust based on actual field count
+    int total_fields = 40; // Adjust based on actual field count
     
     if (key == 27) { // ESC - Cancel
         list->mode = (list->current_contact != NULL) ? VIEW_DETAIL : VIEW_LIST;
@@ -1319,8 +1502,18 @@ int handle_edit_input(ContactList* list) {
             case 27: edit_field(c->url, 50); break;
             case 28: edit_field(c->linkedin, 40); break;
             case 29: edit_field(c->twitter, 30); break;
-            case 30: edit_field(c->categories, 40); break;
-            case 31: edit_field(c->note, 50); break;
+            case 30: edit_field(c->impp, 40); break;
+            case 31: edit_field(c->birthplace, 40); break;
+            case 32: edit_field(c->birthplace_geo, 30); break;
+            case 33: edit_field(c->deathdate, 20); break;
+            case 34: edit_field(c->deathplace, 40); break;
+            case 35: edit_field(c->deathplace_geo, 30); break;
+            case 36: edit_field(c->related, 40); break;
+            case 37: edit_field(c->expertise, 40); break;
+            case 38: edit_field(c->hobby, 40); break;
+            case 39: edit_field(c->interest, 40); break;
+            case 40: edit_field(c->categories, 40); break;
+            case 41: edit_field(c->note, 50); break;
         }
     } else if (key == 's' || key == 'S') { // Save
         update_revision(&list->edit_buffer);
