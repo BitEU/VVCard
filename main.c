@@ -611,7 +611,7 @@ void draw_contact_detail(Contact* contact) {
         free(note_copy);
     }
     
-    draw_status_bar("Press E to Edit, D to Delete, ESC to go back");
+    draw_status_bar("Press E to Edit, D to Delete, ESC to go back, Ctrl+Q/Ctrl+C to Exit");
 }
 
 void draw_edit_form(Contact* contact, int selected_field) {
@@ -757,7 +757,7 @@ void draw_edit_form(Contact* contact, int selected_field) {
     
     #undef DRAW_FIELD
     
-    draw_status_bar("Use ↑/↓ to navigate, Enter to edit field, S to Save, ESC to Cancel");
+    draw_status_bar("Use ↑/↓ to navigate, Enter to edit field, S to Save, ESC to Cancel, Ctrl+Q/Ctrl+C to Exit");
 }
 
 // VCARD functions
@@ -1365,7 +1365,7 @@ int handle_list_input(ContactList* list) {
     int key = _getch();
     int list_height = WINDOW_HEIGHT - 6;
     
-    if (key == 27) { // ESC
+    if (key == 27 || key == 17 || key == 3) { // ESC, Ctrl+Q, or Ctrl+C
         return 1; // Exit program
     } else if (key == 224) { // Arrow keys
         key = _getch();
@@ -1424,6 +1424,8 @@ int handle_detail_input(ContactList* list) {
     
     if (key == 27) { // ESC - Back to list
         list->mode = VIEW_LIST;
+    } else if (key == 17 || key == 3) { // Ctrl+Q or Ctrl+C - Exit program
+        return 1;
     } else if (key == 'e' || key == 'E') { // Edit
         list->mode = VIEW_EDIT;
         list->edit_buffer = *list->current_contact;
@@ -1456,6 +1458,8 @@ int handle_edit_input(ContactList* list) {
 
     if (key == 27) { // ESC - Cancel
         list->mode = (list->current_contact != NULL) ? VIEW_DETAIL : VIEW_LIST;
+    } else if (key == 17 || key == 3) { // Ctrl+Q or Ctrl+C - Exit program
+        return 1;
     } else if (key == 224) { // Arrow keys
         key = _getch();
         switch (key) {
@@ -1599,19 +1603,19 @@ int main() {
                 draw_title_bar("VCard Contact Manager - Contact List");
                 draw_borders();
                 draw_contact_list(list);
-                draw_status_bar("↑/↓ Navigate | Enter: View | N: New | S: Search | R: Refresh | ESC: Exit");
+                draw_status_bar("↑/↓ Navigate | Enter: View | N: New | S: Search | R: Refresh | ESC/Ctrl+Q/Ctrl+C: Exit");
                 if (handle_list_input(list)) goto exit;
                 break;
                 
             case VIEW_DETAIL:
                 draw_contact_detail(list->current_contact);
-                handle_detail_input(list);
+                if (handle_detail_input(list)) goto exit;
                 break;
                 
             case VIEW_EDIT:
             case VIEW_NEW:
                 draw_edit_form(&list->edit_buffer, list->edit_field);
-                handle_edit_input(list);
+                if (handle_edit_input(list)) goto exit;
                 break;
                 
             case VIEW_SEARCH:
