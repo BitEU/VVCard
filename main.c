@@ -55,9 +55,9 @@ char* stristr(const char* haystack, const char* needle) {
 #define MAX_PHONES 3
 #define MAX_ADDRESSES 3
 
-// Window dimensions
-#define WINDOW_WIDTH 160
-#define WINDOW_HEIGHT 48
+// Window dimensions - will be set dynamically based on screen size
+int WINDOW_WIDTH = 160;
+int WINDOW_HEIGHT = 48;
 
 #define FOREGROUND_WHITE (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
 #define FOREGROUND_GRAY (FOREGROUND_INTENSITY)
@@ -215,6 +215,39 @@ void setup_console_size() {
         printf("This program may need to be run in a standard Windows console.\n");
         exit(1);
     }
+
+    // Get screen resolution to determine optimal window size
+    HDC hdc = GetDC(NULL);
+    int screen_width = GetDeviceCaps(hdc, HORZRES);
+    int screen_height = GetDeviceCaps(hdc, VERTRES);
+    ReleaseDC(NULL, hdc);
+    
+    // Calculate console character dimensions (approximate)
+    int char_width = 8;  // Typical console character width in pixels
+    int char_height = 16; // Typical console character height in pixels
+    
+    // Calculate maximum usable console size (leave some margin)
+    int max_console_width = (screen_width - 100) / char_width;
+    int max_console_height = (screen_height - 150) / char_height;
+    
+    // Adjust window dimensions based on screen size
+    if (screen_width <= 1366 || screen_height <= 768) {
+        // Small screen - use smaller dimensions
+        WINDOW_WIDTH = min(120, max_console_width);
+        WINDOW_HEIGHT = min(35, max_console_height);
+    } else if (screen_width <= 1600 || screen_height <= 900) {
+        // Medium screen - use medium dimensions
+        WINDOW_WIDTH = min(140, max_console_width);
+        WINDOW_HEIGHT = min(42, max_console_height);
+    } else {
+        // Large screen - use full dimensions
+        WINDOW_WIDTH = min(160, max_console_width);
+        WINDOW_HEIGHT = min(48, max_console_height);
+    }
+    
+    // Ensure minimum usable size
+    if (WINDOW_WIDTH < 80) WINDOW_WIDTH = 80;
+    if (WINDOW_HEIGHT < 25) WINDOW_HEIGHT = 25;
 
     LONG style = GetWindowLong(hwnd, GWL_STYLE);
     style &= ~WS_SIZEBOX;
